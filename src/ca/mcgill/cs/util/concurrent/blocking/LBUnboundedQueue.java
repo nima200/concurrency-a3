@@ -1,25 +1,29 @@
 package ca.mcgill.cs.util.concurrent.blocking;
 
 import ca.mcgill.cs.util.concurrent.exception.EmptyQueueException;
+import ca.mcgill.cs.util.concurrent.util.QOp;
+import ca.mcgill.cs.util.concurrent.util.QOpRecord;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class LBUnboundedQueue<T> {
     private ReentrantLock aEnqueueLock, aDequeueLock, aIDSetLock;
     private HashSet<Integer> aUsedIDs;
-    private AtomicInteger aSize;
     private Node<T> aHead, aTail;
+
+    private List<QOpRecord> aQOpRecords;
 
     public LBUnboundedQueue() {
         aHead = new Node<>(0, null);
         aTail = aHead;
-        aSize = new AtomicInteger(0);
         aEnqueueLock = new ReentrantLock();
         aDequeueLock = new ReentrantLock();
         aIDSetLock = new ReentrantLock();
+        aQOpRecords = new ArrayList<>();
         aUsedIDs = new HashSet<>();
         aUsedIDs.add(0);
     }
@@ -27,7 +31,6 @@ public class LBUnboundedQueue<T> {
     public void enqueue(T x) {
         // Reserve node value
         aIDSetLock.lock();
-        // Do not worry about overflow for now
         Integer newId;
         try {
             newId = Collections.max(aUsedIDs) + 1;
@@ -44,7 +47,9 @@ public class LBUnboundedQueue<T> {
             // Update tail->next and new tail
             aTail.next = n;
             aTail = n;
-            n.setAdded(System.currentTimeMillis());
+            long timeStamp = System.currentTimeMillis();
+            n.setAdded(timeStamp);
+            aQOpRecords.add(new QOpRecord(QOp.ENQ, timeStamp, newId));
         } finally {
             aEnqueueLock.unlock();
         }
@@ -61,10 +66,16 @@ public class LBUnboundedQueue<T> {
             // Update queue structure
             result = oldNode.getValue();
             aHead = aHead.next;
-            oldNode.setRemoved(System.currentTimeMillis());
+            long timeStamp = System.currentTimeMillis();
+            oldNode.setRemoved(timeStamp);
+            aQOpRecords.add(new QOpRecord(QOp.DEQ, timeStamp, oldNode.getId()));
         } finally {
             aDequeueLock.unlock();
         }
         return result;
+    }
+
+    public List<QOpRecord> getQOpRecords() {
+        return aQOpRecords;
     }
 }
