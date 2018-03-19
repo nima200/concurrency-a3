@@ -1,4 +1,4 @@
-package ca.mcgill.cs.util.concurrent.blocking;
+package ca.mcgill.cs.util.concurrent.lock_based;
 
 import ca.mcgill.cs.util.concurrent.exception.EmptyQueueException;
 import ca.mcgill.cs.util.concurrent.util.QOp;

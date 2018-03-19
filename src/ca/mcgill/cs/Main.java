@@ -1,6 +1,6 @@
 package ca.mcgill.cs;
 
-import ca.mcgill.cs.util.concurrent.blocking.LBUnboundedQueue;
+import ca.mcgill.cs.util.concurrent.lock_based.LBUnboundedQueue;
 import ca.mcgill.cs.util.concurrent.runnable.Dequeuer;
 import ca.mcgill.cs.util.concurrent.runnable.Enqueuer;
 import ca.mcgill.cs.util.concurrent.util.QOpRecord;
