@@ -1,6 +1,6 @@
 package ca.mcgill.cs.util.concurrent.util;
 
-public class QOpRecord implements Comparable<QOpRecord> {
+public class QOpRecord implements Comparable {
     public QOp operation;
     public long time_stamp;
     public int id;
@@ -12,15 +12,19 @@ public class QOpRecord implements Comparable<QOpRecord> {
     }
 
     @Override
-    public int compareTo(QOpRecord o) {
-        if (this.time_stamp < o.time_stamp) {
+    public int compareTo(Object o) {
+        if (!(o instanceof QOpRecord)) {
+            throw new ClassCastException("A QopRecord object expected");
+        }
+        QOpRecord other = (QOpRecord) o;
+        if (this.time_stamp < other.time_stamp) {
             return -1;
-        } else if (this.time_stamp > o.time_stamp) {
+        } else if (this.time_stamp > other.time_stamp) {
             return 1;
         } else {
-            if (this.operation == QOp.ENQ && o.operation == QOp.DEQ) {
+            if (this.operation == QOp.ENQ && other.operation == QOp.DEQ) {
                 return -1;
-            } else if (this.operation == QOp.DEQ && o.operation == QOp.ENQ) {
+            } else if (this.operation == QOp.DEQ && other.operation == QOp.ENQ) {
                 return 1;
             } else {
                 return 0;

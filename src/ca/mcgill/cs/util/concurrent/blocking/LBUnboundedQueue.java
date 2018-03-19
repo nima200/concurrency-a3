@@ -49,7 +49,7 @@ public class LBUnboundedQueue<T> {
             aTail = n;
             long timeStamp = System.currentTimeMillis();
             n.setAdded(timeStamp);
-            aQOpRecords.add(new QOpRecord(QOp.ENQ, timeStamp, newId));
+            addRecord(new QOpRecord(QOp.ENQ, timeStamp, newId));
         } finally {
             aEnqueueLock.unlock();
         }
@@ -68,11 +68,15 @@ public class LBUnboundedQueue<T> {
             aHead = aHead.next;
             long timeStamp = System.currentTimeMillis();
             oldNode.setRemoved(timeStamp);
-            aQOpRecords.add(new QOpRecord(QOp.DEQ, timeStamp, oldNode.getId()));
+            addRecord(new QOpRecord(QOp.DEQ, timeStamp, oldNode.getId()));
         } finally {
             aDequeueLock.unlock();
         }
         return result;
+    }
+
+    private synchronized void addRecord(QOpRecord pRecord) {
+        aQOpRecords.add(pRecord);
     }
 
     public List<QOpRecord> getQOpRecords() {
