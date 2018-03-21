@@ -1,6 +1,6 @@
-package ca.mcgill.cs.util.concurrent.runnable;
+package ca.mcgill.cs.q1.concurrent.lock_based.runnable;
 
-import ca.mcgill.cs.util.concurrent.lock_based.LBUnboundedQueue;
+import ca.mcgill.cs.q1.concurrent.lock_based.queue.LBUnboundedQueue;
 
 import java.util.Random;
 

@@ -1,4 +1,4 @@
-package ca.mcgill.cs.util.concurrent.lock_based;
+package ca.mcgill.cs.q1.concurrent.lock_based.queue;
 
 import java.sql.Timestamp;
 

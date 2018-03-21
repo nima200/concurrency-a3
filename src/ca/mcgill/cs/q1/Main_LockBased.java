@@ -1,15 +1,15 @@
-package ca.mcgill.cs;
+package ca.mcgill.cs.q1;
 
-import ca.mcgill.cs.util.concurrent.lock_based.LBUnboundedQueue;
-import ca.mcgill.cs.util.concurrent.runnable.Dequeuer;
-import ca.mcgill.cs.util.concurrent.runnable.Enqueuer;
-import ca.mcgill.cs.util.concurrent.util.QOpRecord;
+import ca.mcgill.cs.q1.concurrent.lock_based.queue.LBUnboundedQueue;
+import ca.mcgill.cs.q1.concurrent.lock_based.runnable.Dequeuer;
+import ca.mcgill.cs.q1.concurrent.lock_based.runnable.Enqueuer;
+import ca.mcgill.cs.q1.concurrent.util.QOpRecord;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Main {
+public class Main_LockBased {
 
     public static void main(String[] args) {
         if (args.length != 3) {

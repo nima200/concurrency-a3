@@ -1,7 +1,7 @@
-package ca.mcgill.cs.util.concurrent.runnable;
+package ca.mcgill.cs.q1.concurrent.lock_based.runnable;
 
-import ca.mcgill.cs.util.concurrent.lock_based.LBUnboundedQueue;
-import ca.mcgill.cs.util.concurrent.exception.EmptyQueueException;
+import ca.mcgill.cs.q1.concurrent.lock_based.queue.LBUnboundedQueue;
+import ca.mcgill.cs.q1.concurrent.exception.EmptyQueueException;
 
 public class Dequeuer implements Runnable {
 
@@ -18,9 +18,11 @@ public class Dequeuer implements Runnable {
     public void run() {
         while (aDequeueCount < aDequeueCapacity) {
             try {
-                aQueue.dequeue();
+                Integer result = aQueue.dequeue();
+                if (result != null) {
+                    aDequeueCount++;
+                }
             } catch (EmptyQueueException ignored) {}
-            aDequeueCount++;
             try {
                 Thread.sleep(10);
             } catch (InterruptedException ignored) {

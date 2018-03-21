@@ -1,8 +1,8 @@
-package ca.mcgill.cs.util.concurrent.lock_based;
+package ca.mcgill.cs.q1.concurrent.lock_based.queue;
 
-import ca.mcgill.cs.util.concurrent.exception.EmptyQueueException;
-import ca.mcgill.cs.util.concurrent.util.QOp;
-import ca.mcgill.cs.util.concurrent.util.QOpRecord;
+import ca.mcgill.cs.q1.concurrent.exception.EmptyQueueException;
+import ca.mcgill.cs.q1.concurrent.util.QOp;
+import ca.mcgill.cs.q1.concurrent.util.QOpRecord;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class LBUnboundedQueue<T> {
-    private ReentrantLock aEnqueueLock, aDequeueLock, aIDSetLock;
+    private ReentrantLock aEnqueueLock;
+    private ReentrantLock aDequeueLock;
     private HashSet<Integer> aUsedIDs;
     private Node<T> aHead, aTail;
 
@@ -22,7 +23,6 @@ public class LBUnboundedQueue<T> {
         aTail = aHead;
         aEnqueueLock = new ReentrantLock();
         aDequeueLock = new ReentrantLock();
-        aIDSetLock = new ReentrantLock();
         aQOpRecords = new ArrayList<>();
         aUsedIDs = new HashSet<>();
         aUsedIDs.add(0);
@@ -30,15 +30,7 @@ public class LBUnboundedQueue<T> {
 
     public void enqueue(T x) {
         // Reserve node value
-        aIDSetLock.lock();
-        Integer newId;
-        try {
-            newId = Collections.max(aUsedIDs) + 1;
-            aUsedIDs.add(newId);
-        } finally {
-            aIDSetLock.unlock();
-        }
-        assert newId != 0;
+        int newId = getNextID();
         // Prevent anyone else from enqueueing at the same time
         aEnqueueLock.lock();
         try {
@@ -84,5 +76,11 @@ public class LBUnboundedQueue<T> {
 
     public List<QOpRecord> getQOpRecords() {
         return aQOpRecords;
+    }
+
+    private synchronized int getNextID() {
+        int newID = Collections.max(aUsedIDs) + 1;
+        aUsedIDs.add(newID);
+        return newID;
     }
 }
