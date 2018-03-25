@@ -1,4 +1,4 @@
-package ca.mcgill.cs.q1.concurrent.util;
+package ca.mcgill.cs.comp409.a3.q1.concurrent.util;
 
 public class QOpRecord implements Comparable {
     public QOp operation;

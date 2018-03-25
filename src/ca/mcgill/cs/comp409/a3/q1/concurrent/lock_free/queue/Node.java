@@ -1,4 +1,4 @@
-package ca.mcgill.cs.q1.concurrent.lock_free.queue;
+package ca.mcgill.cs.comp409.a3.q1.concurrent.lock_free.queue;
 
 import java.sql.Timestamp;
 import java.util.concurrent.atomic.AtomicReference;

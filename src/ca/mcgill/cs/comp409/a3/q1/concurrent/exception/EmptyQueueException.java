@@ -1,4 +1,4 @@
-package ca.mcgill.cs.q1.concurrent.exception;
+package ca.mcgill.cs.comp409.a3.q1.concurrent.exception;
 
 public class EmptyQueueException extends RuntimeException {
     public EmptyQueueException() {

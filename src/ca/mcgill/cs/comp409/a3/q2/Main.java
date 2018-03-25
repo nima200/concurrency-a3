@@ -1,12 +1,11 @@
-package ca.mcgill.cs.q2;
+package ca.mcgill.cs.comp409.a3.q2;
 
-import ca.mcgill.cs.q2.util.CollectionUtils;
+import ca.mcgill.cs.comp409.a3.q2.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class Main {
     private static final AtomicInteger mutex = new AtomicInteger(1);
@@ -25,28 +24,31 @@ public class Main {
             System.out.println("Unable to convert arguments to integers. Please enter valid integers only.");
             System.exit(1);
         }
-
-        List<Node> nodes = GraphMaker.ConstructGraph(n, e);
-        List<Node> conflicts = nodes;
-        long start = System.currentTimeMillis();
-        while (!conflicts.isEmpty()) {
-            Assign(nodes, 1);
-            conflicts = DetectConflicts(conflicts, 1);
-        }
-        long stop = System.currentTimeMillis();
-        System.out.println(stop - start);
-        int maxDim = 0;
-        int maxCol = 0;
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getNeighbors().size() > maxDim) {
-                maxDim = nodes.get(i).getNeighbors().size();
+        int meanTime = 0;
+        for (int j = 0; j < 5; j++) {
+            List<Node> nodes = GraphMaker.ConstructGraph(n, e);
+            List<Node> conflicts = nodes;
+            long start = System.currentTimeMillis();
+            while (!conflicts.isEmpty()) {
+                Assign(nodes, t);
+                conflicts = DetectConflicts(conflicts, t);
             }
-            if (nodes.get(i).color > maxCol) {
-                maxCol = nodes.get(i).color;
+            long stop = System.currentTimeMillis();
+            System.out.println(stop - start);
+            int maxDim = 0;
+            int maxCol = 0;
+            for (int i = 0; i < nodes.size(); i++) {
+                if (nodes.get(i).getNeighbors().size() > maxDim) {
+                    maxDim = nodes.get(i).getNeighbors().size();
+                }
+                if (nodes.get(i).color > maxCol) {
+                    maxCol = nodes.get(i).color;
+                }
             }
+            meanTime += stop - start;
         }
-        System.out.println(maxDim);
-        System.out.println(maxCol);
+        meanTime /= 5;
+        System.out.println("Average Time: " + meanTime);
     }
 
     private static void Assign(List<Node> conflicting, int threadCount) throws InterruptedException {

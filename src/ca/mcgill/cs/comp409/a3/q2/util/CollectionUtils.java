@@ -1,6 +1,6 @@
-package ca.mcgill.cs.q2.util;
+package ca.mcgill.cs.comp409.a3.q2.util;
 
-import ca.mcgill.cs.q2.Node;
+import ca.mcgill.cs.comp409.a3.q2.Node;
 
 import java.util.ArrayList;
 import java.util.Collections;

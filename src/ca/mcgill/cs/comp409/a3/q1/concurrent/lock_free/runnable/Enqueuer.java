@@ -1,14 +1,14 @@
-package ca.mcgill.cs.q1.concurrent.lock_based.runnable;
+package ca.mcgill.cs.comp409.a3.q1.concurrent.lock_free.runnable;
 
-import ca.mcgill.cs.q1.concurrent.lock_based.queue.LBUnboundedQueue;
+import ca.mcgill.cs.comp409.a3.q1.concurrent.lock_free.queue.LFUnboundedQueue;
 
 import java.util.Random;
 
 public class Enqueuer implements Runnable {
 
-    private LBUnboundedQueue<Integer> aQueue;
+    private LFUnboundedQueue<Integer> aQueue;
 
-    public Enqueuer(LBUnboundedQueue<Integer> pQueue) {
+    public Enqueuer(LFUnboundedQueue<Integer> pQueue) {
         aQueue = pQueue;
     }
 

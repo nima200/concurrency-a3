@@ -1,15 +1,15 @@
-package ca.mcgill.cs.q1.concurrent.lock_free.runnable;
+package ca.mcgill.cs.comp409.a3.q1.concurrent.lock_based.runnable;
 
-import ca.mcgill.cs.q1.concurrent.exception.EmptyQueueException;
-import ca.mcgill.cs.q1.concurrent.lock_free.queue.LFUnboundedQueue;
+import ca.mcgill.cs.comp409.a3.q1.concurrent.lock_based.queue.LBUnboundedQueue;
+import ca.mcgill.cs.comp409.a3.q1.concurrent.exception.EmptyQueueException;
 
 public class Dequeuer implements Runnable {
 
-    private LFUnboundedQueue aQueue;
+    private LBUnboundedQueue<Integer> aQueue;
     private int aDequeueCapacity;
     private int aDequeueCount;
 
-    public Dequeuer(LFUnboundedQueue pQueue, int pDequeueCapacity) {
+    public Dequeuer(LBUnboundedQueue<Integer> pQueue, int pDequeueCapacity) {
         aQueue = pQueue;
         aDequeueCapacity = pDequeueCapacity;
     }
@@ -18,8 +18,10 @@ public class Dequeuer implements Runnable {
     public void run() {
         while (aDequeueCount < aDequeueCapacity) {
             try {
-                aQueue.dequeue();
-                aDequeueCount++;
+                Integer result = aQueue.dequeue();
+                if (result != null) {
+                    aDequeueCount++;
+                }
             } catch (EmptyQueueException ignored) {}
             try {
                 Thread.sleep(10);

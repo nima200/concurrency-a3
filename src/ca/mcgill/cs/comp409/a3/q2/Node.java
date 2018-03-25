@@ -1,4 +1,4 @@
-package ca.mcgill.cs.q2;
+package ca.mcgill.cs.comp409.a3.q2;
 
 import java.util.ArrayList;
 import java.util.List;
