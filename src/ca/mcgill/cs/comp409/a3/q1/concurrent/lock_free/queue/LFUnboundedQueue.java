@@ -40,7 +40,7 @@ public class LFUnboundedQueue<T> {
                         node.setAdded(timeStamp);
                         node.aId = newId;
                         aTail.compareAndSet(last, node);
-//                         Create a new queue operation record for node addition
+                        // Create a new queue operation record for node addition
                         addRecord(new QOpRecord(QOp.ENQ, timeStamp, newId));
                         return;
                     }
