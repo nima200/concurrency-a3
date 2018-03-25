@@ -34,7 +34,7 @@ public class Main {
                 conflicts = DetectConflicts(conflicts, t);
             }
             long stop = System.currentTimeMillis();
-            System.out.println(stop - start);
+            System.out.println("Run " + j + " time taken to color: " + (stop - start));
             int maxDim = 0;
             int maxCol = 0;
             for (int i = 0; i < nodes.size(); i++) {
@@ -46,9 +46,11 @@ public class Main {
                 }
             }
             meanTime += stop - start;
+            System.out.println("Run " + j + " Max Degree: " + maxDim);
+            System.out.println("Run " + j + " Max Color Used: " + maxCol);
         }
         meanTime /= 5;
-        System.out.println("Average Time: " + meanTime);
+        System.out.println("Average Coloring Time: " + meanTime);
     }
 
     private static void Assign(List<Node> conflicting, int threadCount) throws InterruptedException {
