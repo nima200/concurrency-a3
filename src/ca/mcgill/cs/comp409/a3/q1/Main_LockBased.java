@@ -25,46 +25,39 @@ public class Main_LockBased {
             System.out.println("Unable to convert arguments. Please enter digits for all 3 arguments.");
             System.exit(1);
         }
-        long meanTime = 0;
-        for (int j = 0; j < 10; j++) {
-            long start = System.currentTimeMillis();
-            LBUnboundedQueue<Integer> intQueue = new LBUnboundedQueue<>();
 
-            List<Thread> enqueuers = new ArrayList<>();
-            List<Thread> dequeuers = new ArrayList<>();
-            for (int i = 0; i < Math.max(p, q); i++) {
-                if (i < p) {
-                    Thread enqueueThread = new Thread(new Enqueuer(intQueue));
-                    enqueuers.add(enqueueThread);
-                    enqueueThread.start();
-                }
-                if (i < q) {
-                    Thread dequeueThread = new Thread(new Dequeuer(intQueue, n));
-                    dequeuers.add(dequeueThread);
-                    dequeueThread.start();
-                }
+        LBUnboundedQueue<Integer> intQueue = new LBUnboundedQueue<>();
+
+        List<Thread> enqueuers = new ArrayList<>();
+        List<Thread> dequeuers = new ArrayList<>();
+        for (int i = 0; i < Math.max(p, q); i++) {
+            if (i < p) {
+                Thread enqueueThread = new Thread(new Enqueuer(intQueue));
+                enqueuers.add(enqueueThread);
+                enqueueThread.start();
             }
-
-            waitOnThreads(dequeuers);
-
-            for (Thread eqThread:
-                    enqueuers) {
-                eqThread.interrupt();
+            if (i < q) {
+                Thread dequeueThread = new Thread(new Dequeuer(intQueue, n));
+                dequeuers.add(dequeueThread);
+                dequeueThread.start();
             }
-
-            waitOnThreads(enqueuers);
-            long stop = System.currentTimeMillis();
-            meanTime += stop - start;
         }
-        meanTime /= 10;
-        System.out.println(meanTime);
-//        List<QOpRecord> records = intQueue.getQOpRecords();
-//        Collections.sort(records);
-//
-//        for (QOpRecord record :
-//                intQueue.getQOpRecords()) {
-//            System.out.println(record.operation + " " + record.id);
-//        }
+
+        waitOnThreads(dequeuers);
+
+        for (Thread eqThread:
+                enqueuers) {
+            eqThread.interrupt();
+        }
+
+        waitOnThreads(enqueuers);
+        List<QOpRecord> records = intQueue.getQOpRecords();
+        Collections.sort(records);
+
+        for (QOpRecord record :
+                intQueue.getQOpRecords()) {
+            System.out.println(record.operation + " " + record.id);
+        }
     }
 
     private static void waitOnThreads(List<Thread> pDequeuers) {

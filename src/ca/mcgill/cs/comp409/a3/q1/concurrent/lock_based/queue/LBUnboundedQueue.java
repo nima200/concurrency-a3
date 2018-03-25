@@ -30,19 +30,19 @@ public class LBUnboundedQueue<T> {
 
     public void enqueue(T x) {
         // Reserve node value
-//        int newId = getNextID();
+        int newId = getNextID();
         // Prevent anyone else from enqueueing at the same time
         aEnqueueLock.lock();
         try {
             // Create new node out of value and ID
-            Node<T> n = new Node<>(0, x);
+            Node<T> n = new Node<>(newId, x);
             // Update tail->next and new tail
             aTail.next = n;
             aTail = n;
-//            long timeStamp = System.currentTimeMillis();
-//            n.setAdded(timeStamp);
+            long timeStamp = System.currentTimeMillis();
+            n.setAdded(timeStamp);
             // Create a new queue operation record for node addition
-//            addRecord(new QOpRecord(QOp.ENQ, timeStamp, newId));
+            addRecord(new QOpRecord(QOp.ENQ, timeStamp, newId));
         } finally {
             aEnqueueLock.unlock();
         }
@@ -59,11 +59,11 @@ public class LBUnboundedQueue<T> {
             // Update queue structure
             result = oldNode.getValue();
             aHead = aHead.next;
-//            long timeStamp = System.currentTimeMillis();
+            long timeStamp = System.currentTimeMillis();
             // Set removal timestamp
-//            oldNode.setRemoved(timeStamp);
+            oldNode.setRemoved(timeStamp);
             // Create a new queue operation record for node removal
-//            addRecord(new QOpRecord(QOp.DEQ, timeStamp, oldNode.getId()));
+            addRecord(new QOpRecord(QOp.DEQ, timeStamp, oldNode.getId()));
         } finally {
             aDequeueLock.unlock();
         }

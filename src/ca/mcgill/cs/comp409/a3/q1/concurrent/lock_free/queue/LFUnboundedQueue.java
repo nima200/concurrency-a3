@@ -35,13 +35,13 @@ public class LFUnboundedQueue<T> {
                 if (next == null) {
                     if (last.next.compareAndSet(next, node)) {
                         // Reserve node value
-//                        int newId = getNextID();
-//                        long timeStamp = System.currentTimeMillis();
-//                        node.setAdded(timeStamp);
-                        node.aId = 0;
+                        int newId = getNextID();
+                        long timeStamp = System.currentTimeMillis();
+                        node.setAdded(timeStamp);
+                        node.aId = newId;
                         aTail.compareAndSet(last, node);
 //                         Create a new queue operation record for node addition
-//                        addRecord(new QOpRecord(QOp.ENQ, timeStamp, newId));
+                        addRecord(new QOpRecord(QOp.ENQ, timeStamp, newId));
                         return;
                     }
                 } else {
@@ -65,9 +65,9 @@ public class LFUnboundedQueue<T> {
                 } else {
                     T value = next.aValue;
                     if (aHead.compareAndSet(first, next)) {
-//                        long timeStamp = System.currentTimeMillis();
-//                        next.setRemoved(timeStamp);
-//                        addRecord(new QOpRecord(QOp.DEQ, timeStamp, next.aId));
+                        long timeStamp = System.currentTimeMillis();
+                        next.setRemoved(timeStamp);
+                        addRecord(new QOpRecord(QOp.DEQ, timeStamp, next.aId));
                         return value;
                     }
                 }
