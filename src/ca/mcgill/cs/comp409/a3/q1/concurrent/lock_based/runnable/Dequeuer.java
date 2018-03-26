@@ -22,12 +22,8 @@ public class Dequeuer implements Runnable {
                 if (result != null) {
                     aDequeueCount++;
                 }
-            } catch (EmptyQueueException ignored) {}
-            try {
                 Thread.sleep(10);
-            } catch (InterruptedException ignored) {
-                return;
-            }
+            } catch (EmptyQueueException | InterruptedException ignored) {}
         }
     }
 }
