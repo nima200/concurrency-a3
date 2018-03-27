@@ -36,6 +36,8 @@ public class LFUnboundedQueue<T> {
             Node<T> next = last.next.get();
             if (last == aTail.get()) {
                 if (next == null) {
+                    // Must set timestamp before actually setting the node or else a dequeuer can dequeue it before the
+                    // timestamp was set
                     long timeStamp = System.nanoTime();
                     if (last.next.compareAndSet(next, node)) {
                         node.setAdded(timeStamp);
