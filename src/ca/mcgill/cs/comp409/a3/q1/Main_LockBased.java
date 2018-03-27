@@ -28,9 +28,7 @@ public class Main_LockBased {
             System.exit(1);
         }
 
-
         LBUnboundedQueue<Integer> intQueue = new LBUnboundedQueue<>();
-
         // Start the enqueuers and dequeuers
         List<Enqueuer> enqueuers = new ArrayList<>();
         List<Dequeuer<Integer>> dequeuers = new ArrayList<>();

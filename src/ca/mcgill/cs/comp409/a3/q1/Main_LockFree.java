@@ -28,7 +28,6 @@ public class Main_LockFree {
             System.exit(1);
         }
         LFUnboundedQueue<Integer> intQueue = new LFUnboundedQueue<>();
-
         // Start the enqueuers and dequeuers
         List<Enqueuer> enqueuers = new ArrayList<>();
         List<Dequeuer<Integer>> dequeuers = new ArrayList<>();

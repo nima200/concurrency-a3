@@ -8,12 +8,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class LBUnboundedQueue<T> {
     private ReentrantLock aEnqueueLock;
     private ReentrantLock aDequeueLock;
-    private HashSet<Integer> aUsedIDs;
+    private AtomicInteger aNextID;
     private Node<T> aHead, aTail;
 
     public LBUnboundedQueue() {
@@ -21,13 +22,12 @@ public class LBUnboundedQueue<T> {
         aTail = aHead;
         aEnqueueLock = new ReentrantLock();
         aDequeueLock = new ReentrantLock();
-        aUsedIDs = new HashSet<>();
-        aUsedIDs.add(0);
+        aNextID = new AtomicInteger(1);
     }
 
     public void enqueue(T x) {
         // Reserve node value
-        int newId = getNextID();
+        int newId = aNextID.getAndIncrement();
         // Prevent anyone else from enqueueing at the same time
         aEnqueueLock.lock();
         try {
@@ -58,11 +58,5 @@ public class LBUnboundedQueue<T> {
         } finally {
             aDequeueLock.unlock();
         }
-    }
-
-    private synchronized int getNextID() {
-        int newID = Collections.max(aUsedIDs) + 1;
-        aUsedIDs.add(newID);
-        return newID;
     }
 }
