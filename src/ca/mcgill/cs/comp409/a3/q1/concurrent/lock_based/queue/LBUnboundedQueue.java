@@ -16,14 +16,11 @@ public class LBUnboundedQueue<T> {
     private HashSet<Integer> aUsedIDs;
     private Node<T> aHead, aTail;
 
-    private List<QOpRecord> aQOpRecords;
-
     public LBUnboundedQueue() {
         aHead = new Node<>(0, null);
         aTail = aHead;
         aEnqueueLock = new ReentrantLock();
         aDequeueLock = new ReentrantLock();
-        aQOpRecords = new ArrayList<>();
         aUsedIDs = new HashSet<>();
         aUsedIDs.add(0);
     }
@@ -39,43 +36,28 @@ public class LBUnboundedQueue<T> {
             // Update tail->next and new tail
             aTail.next = n;
             aTail = n;
-            long timeStamp = System.currentTimeMillis();
+            long timeStamp = System.nanoTime();
             n.setAdded(timeStamp);
-            // Create a new queue operation record for node addition
-            addRecord(new QOpRecord(QOp.enq, timeStamp, newId));
         } finally {
             aEnqueueLock.unlock();
         }
     }
 
-    public T dequeue() throws EmptyQueueException {
-        T result;
+    public Node<T> dequeue() throws EmptyQueueException {
         aDequeueLock.lock();
         try {
             if (aHead.next == null) {
                 throw new EmptyQueueException();
             }
             Node<T> oldNode = aHead.next;
-            // Update queue structure
-            result = oldNode.getValue();
             aHead = aHead.next;
-            long timeStamp = System.currentTimeMillis();
+            long timeStamp = System.nanoTime();
             // Set removal timestamp
             oldNode.setRemoved(timeStamp);
-            // Create a new queue operation record for node removal
-            addRecord(new QOpRecord(QOp.deq, timeStamp, oldNode.getId()));
+            return oldNode;
         } finally {
             aDequeueLock.unlock();
         }
-        return result;
-    }
-
-    private synchronized void addRecord(QOpRecord pRecord) {
-        aQOpRecords.add(pRecord);
-    }
-
-    public List<QOpRecord> getQOpRecords() {
-        return aQOpRecords;
     }
 
     private synchronized int getNextID() {

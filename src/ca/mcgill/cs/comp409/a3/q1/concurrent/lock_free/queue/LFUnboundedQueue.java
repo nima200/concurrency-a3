@@ -8,19 +8,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class LFUnboundedQueue<T> {
     private HashSet<Integer> aUsedIDs;
+    private AtomicInteger nextId;
     private AtomicReference<Node<T>> aHead;
     private AtomicReference<Node<T>> aTail;
-    private List<QOpRecord> aQOpRecords;
 
     public LFUnboundedQueue() {
         Node<T> sentinel = new Node<>(null);
         aHead = new AtomicReference<>(sentinel);
         aTail = new AtomicReference<>(sentinel);
-        aQOpRecords = new ArrayList<>();
+        nextId = new AtomicInteger(1);
         aUsedIDs = new HashSet<>();
         aUsedIDs.add(0);
     }
@@ -29,8 +30,7 @@ public class LFUnboundedQueue<T> {
         // Create new node object from value
         Node<T> node = new Node<>(x);
         // Reserve node id
-        int newId = getNextID();
-        node.aId = newId;
+        node.aId = nextId.getAndIncrement();
         while (true) {
             Node<T> last = aTail.get();
             Node<T> next = last.next.get();
@@ -40,8 +40,6 @@ public class LFUnboundedQueue<T> {
                     if (last.next.compareAndSet(next, node)) {
                         node.setAdded(timeStamp);
                         aTail.compareAndSet(last, node);
-                        // Create a new queue operation record for node addition
-                        addRecord(new QOpRecord(QOp.enq, timeStamp, newId));
                         return;
                     }
                 } else {
@@ -51,7 +49,7 @@ public class LFUnboundedQueue<T> {
         }
     }
 
-    public T dequeue() throws EmptyQueueException {
+    public Node<T> dequeue() throws EmptyQueueException {
         while (true) {
             Node<T> first = aHead.get();
             Node<T> last = aTail.get();
@@ -63,29 +61,13 @@ public class LFUnboundedQueue<T> {
                     }
                     aTail.compareAndSet(last, next);
                 } else {
-                    T value = next.aValue;
                     long timeStamp = System.nanoTime();
                     if (aHead.compareAndSet(first, next)) {
                         next.setRemoved(timeStamp);
-                        addRecord(new QOpRecord(QOp.deq, timeStamp, next.aId));
-                        return value;
+                        return next;
                     }
                 }
             }
         }
-    }
-
-    private synchronized void addRecord(QOpRecord pRecord) {
-        aQOpRecords.add(pRecord);
-    }
-
-    public List<QOpRecord> getQOpRecords() {
-        return aQOpRecords;
-    }
-
-    private synchronized int getNextID() {
-        int newID = Collections.max(aUsedIDs) + 1;
-        aUsedIDs.add(newID);
-        return newID;
     }
 }
