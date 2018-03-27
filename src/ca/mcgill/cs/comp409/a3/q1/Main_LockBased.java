@@ -28,68 +28,56 @@ public class Main_LockBased {
             System.exit(1);
         }
 
-        int meanTime = 0;
-        for (int j = 0; j < 10; j++) {
-            long start = System.currentTimeMillis();
-            LBUnboundedQueue<Integer> intQueue = new LBUnboundedQueue<>();
 
-            List<Enqueuer> enqueuers = new ArrayList<>();
-            List<Dequeuer<Integer>> dequeuers = new ArrayList<>();
-            for (int i = 0; i < Math.max(p, q); i++) {
-                if (i < p) {
-                    Enqueuer enqueueThread = new Enqueuer(intQueue);
-                    enqueuers.add(enqueueThread);
-                    enqueueThread.start();
-                }
-                if (i < q) {
-                    Dequeuer<Integer> dequeueThread = new Dequeuer<>(intQueue, n);
-                    dequeuers.add(dequeueThread);
-                    dequeueThread.start();
-                }
+        LBUnboundedQueue<Integer> intQueue = new LBUnboundedQueue<>();
+
+        // Start the enqueuers and dequeuers
+        List<Enqueuer> enqueuers = new ArrayList<>();
+        List<Dequeuer<Integer>> dequeuers = new ArrayList<>();
+        for (int i = 0; i < Math.max(p, q); i++) {
+            if (i < p) {
+                Enqueuer enqueueThread = new Enqueuer(intQueue);
+                enqueuers.add(enqueueThread);
+                enqueueThread.start();
             }
-
-            waitOnDequeuers(dequeuers);
-
-            for (Thread eqThread :
-                    enqueuers) {
-                eqThread.interrupt();
+            if (i < q) {
+                Dequeuer<Integer> dequeueThread = new Dequeuer<>(intQueue, n);
+                dequeuers.add(dequeueThread);
+                dequeueThread.start();
             }
-
-            waitOnEnqueuers(enqueuers);
-            long stop = System.currentTimeMillis();
-            meanTime += stop - start;
-
-
-            List<Node<Integer>> dequeuedNodes = new ArrayList<>();
-            List<QOpRecord> records = new ArrayList<>();
-
-            for (Dequeuer<Integer> dequeuer :
-                    dequeuers) {
-                dequeuedNodes.addAll(dequeuer.getDequeuedNodes());
-            }
-
-            for (Node<Integer> node :
-                    dequeuedNodes) {
-                records.add(new QOpRecord(QOp.enq, node.getAddedTime(), node.getId()));
-                records.add(new QOpRecord(QOp.deq, node.getRemovedTime(), node.getId()));
-            }
-
-            List<String> results = new ArrayList<>();
-            for (QOpRecord record :
-                    records) {
-                results.add(record.operation + " " + record.id + " " + record.time_stamp);
-            }
-
-            Collections.sort(records);
-            EnqDeqValidator.validate(results.toArray(new String[0]));
         }
-        meanTime /= 10;
-        System.out.println(meanTime);
 
-//        for (QOpRecord record :
-//                records) {
-//            System.out.println(record.operation + " " + record.id + " " + record.time_stamp);
-//        }
+        // First wait on all dequeuers to finish dequeueing n items
+        waitOnDequeuers(dequeuers);
+
+        // Once all are done, signal enqueuers to stop and wait for them
+        for (Thread eqThread :
+                enqueuers) {
+            eqThread.interrupt();
+        }
+        waitOnEnqueuers(enqueuers);
+
+        // Collect all dequeued nodes from the dequeuers
+        List<Node<Integer>> dequeuedNodes = new ArrayList<>();
+        for (Dequeuer<Integer> dequeuer :
+                dequeuers) {
+            dequeuedNodes.addAll(dequeuer.getDequeuedNodes());
+        }
+
+        // Create queue operation records from all dequeued nodes, we can safely ignore the extra
+        // few nodes enqueued after interruption
+        List<QOpRecord> records = new ArrayList<>();
+        for (Node<Integer> node :
+                dequeuedNodes) {
+            records.add(new QOpRecord(QOp.enq, node.getAddedTime(), node.getId()));
+            records.add(new QOpRecord(QOp.deq, node.getRemovedTime(), node.getId()));
+        }
+        // Sort and print output for verification
+        Collections.sort(records);
+        for (QOpRecord record :
+                records) {
+            System.out.println(record.operation + " " + record.id);
+        }
     }
 
     private static void waitOnEnqueuers(List<Enqueuer> pDequeuers) {
