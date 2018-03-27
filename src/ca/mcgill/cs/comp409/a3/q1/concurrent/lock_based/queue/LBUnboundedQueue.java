@@ -34,10 +34,10 @@ public class LBUnboundedQueue<T> {
             // Create new node out of value and ID
             Node<T> n = new Node<>(newId, x);
             // Update tail->next and new tail
-            aTail.next = n;
-            aTail = n;
             long timeStamp = System.nanoTime();
             n.setAdded(timeStamp);
+            aTail.next = n;
+            aTail = n;
         } finally {
             aEnqueueLock.unlock();
         }
@@ -50,10 +50,10 @@ public class LBUnboundedQueue<T> {
                 throw new EmptyQueueException();
             }
             Node<T> oldNode = aHead.next;
-            aHead = aHead.next;
             long timeStamp = System.nanoTime();
             // Set removal timestamp
             oldNode.setRemoved(timeStamp);
+            aHead = aHead.next;
             return oldNode;
         } finally {
             aDequeueLock.unlock();
