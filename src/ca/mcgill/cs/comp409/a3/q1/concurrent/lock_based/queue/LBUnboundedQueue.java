@@ -42,7 +42,7 @@ public class LBUnboundedQueue<T> {
             long timeStamp = System.currentTimeMillis();
             n.setAdded(timeStamp);
             // Create a new queue operation record for node addition
-            addRecord(new QOpRecord(QOp.ENQ, timeStamp, newId));
+            addRecord(new QOpRecord(QOp.enq, timeStamp, newId));
         } finally {
             aEnqueueLock.unlock();
         }
@@ -63,7 +63,7 @@ public class LBUnboundedQueue<T> {
             // Set removal timestamp
             oldNode.setRemoved(timeStamp);
             // Create a new queue operation record for node removal
-            addRecord(new QOpRecord(QOp.DEQ, timeStamp, oldNode.getId()));
+            addRecord(new QOpRecord(QOp.deq, timeStamp, oldNode.getId()));
         } finally {
             aDequeueLock.unlock();
         }

@@ -28,20 +28,20 @@ public class LFUnboundedQueue<T> {
     public void enqueue(T x) {
         // Create new node object from value
         Node<T> node = new Node<>(x);
+        // Reserve node id
+        int newId = getNextID();
+        node.aId = newId;
         while (true) {
             Node<T> last = aTail.get();
             Node<T> next = last.next.get();
             if (last == aTail.get()) {
                 if (next == null) {
+                    long timeStamp = System.nanoTime();
                     if (last.next.compareAndSet(next, node)) {
-                        // Reserve node value
-                        int newId = getNextID();
-                        long timeStamp = System.currentTimeMillis();
                         node.setAdded(timeStamp);
-                        node.aId = newId;
                         aTail.compareAndSet(last, node);
                         // Create a new queue operation record for node addition
-                        addRecord(new QOpRecord(QOp.ENQ, timeStamp, newId));
+                        addRecord(new QOpRecord(QOp.enq, timeStamp, newId));
                         return;
                     }
                 } else {
@@ -64,10 +64,10 @@ public class LFUnboundedQueue<T> {
                     aTail.compareAndSet(last, next);
                 } else {
                     T value = next.aValue;
+                    long timeStamp = System.nanoTime();
                     if (aHead.compareAndSet(first, next)) {
-                        long timeStamp = System.currentTimeMillis();
                         next.setRemoved(timeStamp);
-                        addRecord(new QOpRecord(QOp.DEQ, timeStamp, next.aId));
+                        addRecord(new QOpRecord(QOp.deq, timeStamp, next.aId));
                         return value;
                     }
                 }

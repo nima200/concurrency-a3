@@ -22,9 +22,9 @@ public class QOpRecord implements Comparable {
         } else if (this.time_stamp > other.time_stamp) {
             return 1;
         } else {
-            if (this.operation == QOp.ENQ && other.operation == QOp.DEQ) {
+            if (this.operation == QOp.enq && other.operation == QOp.deq) {
                 return -1;
-            } else if (this.operation == QOp.DEQ && other.operation == QOp.ENQ) {
+            } else if (this.operation == QOp.deq && other.operation == QOp.enq) {
                 return 1;
             } else {
                 return 0;

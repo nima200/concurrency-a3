@@ -56,7 +56,7 @@ public class Main_LockBased {
 
         for (QOpRecord record :
                 intQueue.getQOpRecords()) {
-            System.out.println(record.operation + " " + record.id);
+            System.out.println(record.operation + " " + record.id + " " + record.time_stamp);
         }
     }
 
