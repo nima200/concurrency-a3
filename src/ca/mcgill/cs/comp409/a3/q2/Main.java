@@ -24,6 +24,9 @@ public class Main {
             System.out.println("Unable to convert arguments to integers. Please enter valid integers only.");
             System.exit(1);
         }
+        if (e > ((n * n -1)/2)) {
+            System.out.println("Invalid edge count. Max edge count possible is (n*n-1) / 2");
+        }
         int meanTime = 0;
         for (int j = 0; j < 5; j++) {
             List<Node> nodes = GraphMaker.ConstructGraph(n, e);
