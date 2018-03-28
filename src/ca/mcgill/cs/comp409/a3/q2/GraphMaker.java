@@ -11,7 +11,7 @@ public class GraphMaker {
         }
         for (int i = 0; i < e; i++) {
             int vertex1 = ThreadLocalRandom.current().nextInt(n);
-            int vertex2 = vertex1 + ThreadLocalRandom.current().nextInt(1, n - 1) % nodes.size();
+            int vertex2 = (vertex1 + ThreadLocalRandom.current().nextInt(1, n - 1)) % nodes.size();
 
             if (nodes.get(vertex1).getNeighbors().contains(nodes.get(vertex2))) {
                 i--;
