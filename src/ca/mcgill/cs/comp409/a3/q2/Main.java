@@ -2,6 +2,7 @@ package ca.mcgill.cs.comp409.a3.q2;
 
 import ca.mcgill.cs.comp409.a3.q2.util.CollectionUtils;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,8 +25,15 @@ public class Main {
             System.out.println("Unable to convert arguments to integers. Please enter valid integers only.");
             System.exit(1);
         }
-        if (e > ((n * n -1)/2)) {
+        BigInteger maxNodeCount = new BigInteger(Integer.toString(n));
+        BigInteger nMin1 = new BigInteger(Integer.toString(n - 1));
+        maxNodeCount = maxNodeCount.multiply(nMin1);
+        maxNodeCount = maxNodeCount.divide(new BigInteger(Integer.toString(2)));
+        BigInteger eBigInt = new BigInteger(Integer.toString(e));
+
+        if (eBigInt.compareTo(maxNodeCount) > 0) {
             System.out.println("Invalid edge count. Max edge count possible is (n*n-1) / 2");
+            System.exit(1);
         }
         int meanTime = 0;
         for (int j = 0; j < 5; j++) {
@@ -51,6 +59,7 @@ public class Main {
             meanTime += stop - start;
             System.out.println("Run " + j + " Max Degree: " + maxDim);
             System.out.println("Run " + j + " Max Color Used: " + maxCol);
+            System.out.println("Coloring is proper: " + VerifyColoring(nodes));
         }
         meanTime /= 5;
         System.out.println("Average Coloring Time: " + meanTime);
@@ -66,16 +75,17 @@ public class Main {
                     List<Integer> neighborColors = new ArrayList<>();
                     for (Node neighbor : vertex.getNeighbors()) {
                         neighborColors.add(neighbor.color);
-                        int biggestColor = Collections.max(neighborColors) + 1;
-                        int newColor = -1;
-                        for (int i = 1; i <= biggestColor + 1; i++) {
-                            if (!neighborColors.contains(i)) {
-                                newColor = i;
-                                break;
-                            }
-                        }
-                        vertex.color = newColor;
                     }
+                    int biggestColor = Collections.max(neighborColors) + 1;
+                    int newColor = -1;
+                    for (int i = 1; i <= biggestColor + 1; i++) {
+                        if (!neighborColors.contains(i)) {
+                            newColor = i;
+                            break;
+                        }
+                    }
+                    vertex.color = newColor;
+
                 }
             });
             threads.add(thread);
@@ -97,7 +107,7 @@ public class Main {
                 for(Node vertex : subset) {
                     for (Node neighbor : vertex.getNeighbors()) {
                         if (vertex.color == neighbor.color && neighbor.id < vertex.id) {
-                            while (mutex.compareAndSet(1, 0)) {}
+                            while (!mutex.compareAndSet(1, 0)) {}
                             newConflicts.add(vertex);
                             mutex.set(1);
                         }
@@ -112,5 +122,18 @@ public class Main {
             thread.join();
         }
         return newConflicts;
+    }
+
+    private static boolean VerifyColoring(List<Node> vertices) {
+        for (Node vertex :
+                vertices) {
+            for (Node neighbor :
+                    vertex.getNeighbors()) {
+                if (vertex.color == neighbor.color) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
